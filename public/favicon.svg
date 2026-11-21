@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="100%" height="100%">
+  <defs>
+    <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0284c7" />
+      <stop offset="50%" stop-color="#2563eb" />
+      <stop offset="100%" stop-color="#7c3aed" />
+    </linearGradient>
+    <linearGradient id="vaultCoreGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#06b6d4" />
+    </linearGradient>
+    <linearGradient id="trayGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#2563eb" flood-opacity="0.45" />
+    </filter>
+  </defs>
+  <path d="M 60 10 C 85 10 104 22 104 42 C 104 74 60 108 60 108 C 60 108 16 74 16 42 C 16 22 35 10 60 10 Z"
+        fill="url(#shieldGrad)"
+        filter="url(#glow)" />
+  <path d="M 60 16 C 81 16 98 26 98 44 C 98 71 60 100 60 100 C 60 100 22 71 22 44 C 22 26 39 16 60 16 Z"
+        fill="url(#trayGrad)" stroke="#334155" stroke-width="1.5" />
+  <rect x="34" y="32" width="52" height="11" rx="3.5" fill="#1e293b" stroke="#38bdf8" stroke-width="1.2" stroke-opacity="0.7" />
+  <circle cx="42" cy="37.5" r="2" fill="#38bdf8" />
+  <rect x="49" y="36" width="30" height="3" rx="1.5" fill="#475569" />
+  <rect x="34" y="47" width="52" height="11" rx="3.5" fill="#1e293b" stroke="#38bdf8" stroke-width="1.2" stroke-opacity="0.7" />
+  <circle cx="42" cy="52.5" r="2" fill="#38bdf8" />
+  <rect x="49" y="51" width="30" height="3" rx="1.5" fill="#475569" />
+  <circle cx="60" cy="74" r="14" fill="#0f172a" stroke="url(#vaultCoreGrad)" stroke-width="2.5" />
+  <line x1="60" y1="62" x2="60" y2="67" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" />
+  <line x1="60" y1="81" x2="60" y2="86" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" />
+  <line x1="48" y1="74" x2="53" y2="74" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" />
+  <line x1="67" y1="74" x2="72" y2="74" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" />
+  <polygon points="61,68 56,75 59,75 58,80 64,73 61,73" fill="#38bdf8" />
+</svg>

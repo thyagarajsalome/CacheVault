@@ -1,0 +1,9 @@
+@echo off
+title Launching CacheVault Pro...
+cd /d "%~dp0"
+echo Checking for previous instances...
+taskkill /F /IM app.exe 2>nul
+taskkill /F /IM cachevault.exe 2>nul
+echo Starting CacheVault Pro...
+start "" "D:\Agent-Drive\src-tauri\target\release\app.exe"
+exit
