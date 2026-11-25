@@ -1,8 +1,9 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "cachevault",
+  "productName": "CacheVault Pro",
+  "mainBinaryName": "CacheVault",
   "version": "1.0.0",
-  "identifier": "com.cachevault.app",
+  "identifier": "io.cachevault.desktop",
   "build": {
     "frontendDist": "../dist",
     "devUrl": "http://localhost:5173",

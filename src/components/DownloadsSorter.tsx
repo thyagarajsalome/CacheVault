@@ -8,20 +8,30 @@ import {
   Sparkles,
   ArrowRight,
   ShieldCheck,
+  RotateCcw,
 } from 'lucide-react';
 import { invoke } from '@tauri-apps/api/core';
-import type { OrganizerCategoryItem, OrganizeResult, KnownFolderInfo } from '../types';
+import type { OrganizerCategoryItem, OrganizeResult, KnownFolderInfo, DownloadsUndoInfo } from '../types';
 import { formatBytes } from '../utils';
 
 export const DownloadsSorter: React.FC = () => {
   const [categories, setCategories] = useState<OrganizerCategoryItem[]>([]);
   const [selectedSubfolders, setSelectedSubfolders] = useState<Set<string>>(new Set());
-  const [downloadsPath, setDownloadsPath] = useState<string>('D:\\Downloads');
+  const [downloadsPath, setDownloadsPath] = useState<string>('');
+  const [undoInfo, setUndoInfo] = useState<DownloadsUndoInfo | null>(null);
   const [isScanning, setIsScanning] = useState<boolean>(false);
   const [isOrganizing, setIsOrganizing] = useState<boolean>(false);
   const [resultMessage, setResultMessage] = useState<string | null>(null);
 
-  // Auto-detect current downloads path
+  const checkUndoState = async () => {
+    try {
+      const info = await invoke<DownloadsUndoInfo>('get_downloads_undo_info');
+      setUndoInfo(info);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   useEffect(() => {
     const initPath = async () => {
       try {
@@ -33,6 +43,7 @@ export const DownloadsSorter: React.FC = () => {
       } catch (e) {
         console.error(e);
       }
+      await checkUndoState();
     };
     initPath();
   }, []);
@@ -40,7 +51,6 @@ export const DownloadsSorter: React.FC = () => {
   const scanDownloads = async () => {
     if (!downloadsPath) return;
     setIsScanning(true);
-    setResultMessage(null);
 
     try {
       const data = await invoke<OrganizerCategoryItem[]>('scan_downloads_organizer', {
@@ -56,7 +66,9 @@ export const DownloadsSorter: React.FC = () => {
   };
 
   useEffect(() => {
-    scanDownloads();
+    if (downloadsPath) {
+      scanDownloads();
+    }
   }, [downloadsPath]);
 
   const toggleCategory = (destFolder: string) => {
@@ -70,7 +82,7 @@ export const DownloadsSorter: React.FC = () => {
   };
 
   const handleOrganize = async () => {
-    if (selectedSubfolders.size === 0) return;
+    if (selectedSubfolders.size === 0 || !downloadsPath) return;
     setIsOrganizing(true);
     setResultMessage(null);
 
@@ -82,6 +94,22 @@ export const DownloadsSorter: React.FC = () => {
 
       setResultMessage(res.message);
       await scanDownloads();
+      await checkUndoState();
+    } catch (e: any) {
+      setResultMessage('Error: ' + (e?.message || e));
+    } finally {
+      setIsOrganizing(false);
+    }
+  };
+
+  const handleUndo = async () => {
+    setIsOrganizing(true);
+    setResultMessage(null);
+    try {
+      const res = await invoke<OrganizeResult>('undo_last_downloads_organize');
+      setResultMessage(res.message);
+      await scanDownloads();
+      await checkUndoState();
     } catch (e: any) {
       setResultMessage('Error: ' + (e?.message || e));
     } finally {
@@ -123,6 +151,17 @@ export const DownloadsSorter: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-2">
+            {undoInfo?.available && (
+              <button
+                onClick={handleUndo}
+                disabled={isOrganizing}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-amber-300 text-xs rounded-xl border border-amber-500/30 transition-colors"
+                title={`Revert last sort of ${undoInfo.file_count} files`}
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                Undo Last Sort ({undoInfo.file_count})
+              </button>
+            )}
             <button
               onClick={scanDownloads}
               disabled={isScanning}
@@ -139,15 +178,17 @@ export const DownloadsSorter: React.FC = () => {
       <div className="bg-dark-800/50 border border-gray-800 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-2 text-xs">
           <span className="text-gray-400">Target Folder:</span>
-          <span className="font-mono text-amber-400">{downloadsPath}</span>
+          <span className="font-mono text-amber-400">{downloadsPath || 'Detecting...'}</span>
         </div>
-        <button
-          onClick={() => handleOpenFolder(downloadsPath)}
-          className="flex items-center gap-1.5 px-3 py-1 bg-dark-900 hover:bg-dark-800 text-gray-300 text-xs rounded-lg border border-gray-700 transition-colors self-start sm:self-auto"
-        >
-          <FolderOpen className="w-3.5 h-3.5 text-amber-400" />
-          Open Downloads Folder
-        </button>
+        {downloadsPath && (
+          <button
+            onClick={() => handleOpenFolder(downloadsPath)}
+            className="flex items-center gap-1.5 px-3 py-1 bg-dark-900 hover:bg-dark-800 text-gray-300 text-xs rounded-lg border border-gray-700 transition-colors self-start sm:self-auto"
+          >
+            <FolderOpen className="w-3.5 h-3.5 text-amber-400" />
+            Open Downloads Folder
+          </button>
+        )}
       </div>
 
       {resultMessage && (

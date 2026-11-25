@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#090d16" />
+    </linearGradient>
+    <linearGradient id="rimGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#22d3ee" />
+      <stop offset="50%" stop-color="#2563eb" />
+      <stop offset="100%" stop-color="#6366f1" />
+    </linearGradient>
+    <linearGradient id="shieldFill" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0ea5e9" stop-opacity="0.22" />
+      <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.12" />
+    </linearGradient>
+  </defs>
+
+  <!-- Rounded App Icon Tile -->
+  <rect x="48" y="48" width="928" height="928" rx="220" fill="url(#bgGrad)" stroke="url(#rimGrad)" stroke-width="28" />
+
+  <!-- Crisp Shield Outline -->
+  <path d="M 512 190 L 792 295 L 792 505 C 792 690 512 842 512 842 C 512 842 232 690 232 505 L 232 295 Z"
+        fill="url(#shieldFill)"
+        stroke="url(#rimGrad)"
+        stroke-width="44"
+        stroke-linejoin="round" />
+
+  <!-- Clean Vault Keyhole Core -->
+  <circle cx="512" cy="465" r="95" fill="#38bdf8" />
+  <rect x="478" y="530" width="68" height="135" rx="34" fill="#38bdf8" />
+</svg>

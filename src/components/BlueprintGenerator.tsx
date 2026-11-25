@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   FolderPlus,
   CheckCircle,
@@ -12,7 +12,8 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { invoke } from '@tauri-apps/api/core';
-import type { BlueprintResult } from '../types';
+import type { BlueprintResult, DriveInfo } from '../types';
+import { formatBytes } from '../utils';
 
 interface Preset {
   id: string;
@@ -79,14 +80,28 @@ const PRESETS: Preset[] = [
   },
 ];
 
-export const BlueprintGenerator: React.FC = () => {
+interface BlueprintGeneratorProps {
+  drives: DriveInfo[];
+}
+
+export const BlueprintGenerator: React.FC<BlueprintGeneratorProps> = ({ drives }) => {
   const [selectedPresetId, setSelectedPresetId] = useState<string>('developer');
-  const [baseDrive, setBaseDrive] = useState<string>('D:\\');
+  const [baseDrive, setBaseDrive] = useState<string>('');
   const [folders, setFolders] = useState<string[]>(PRESETS[0].folders);
   const [newFolderInput, setNewFolderInput] = useState<string>('');
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [result, setResult] = useState<BlueprintResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (drives.length > 0 && !baseDrive) {
+      const nonC = drives.find((d) => !d.letter.toUpperCase().startsWith('C'));
+      const chosen = nonC ? nonC.letter : drives[0].letter;
+      setBaseDrive(chosen.endsWith('\\') ? chosen : `${chosen}\\`);
+    } else if (!baseDrive) {
+      setBaseDrive('C:\\');
+    }
+  }, [drives, baseDrive]);
 
   const handleSelectPreset = (preset: Preset) => {
     setSelectedPresetId(preset.id);
@@ -148,7 +163,7 @@ export const BlueprintGenerator: React.FC = () => {
           <div>
             <h2 className="text-xl font-bold text-white tracking-tight">Drive Blueprint Generator</h2>
             <p className="text-sm text-gray-400">
-              Instantly scaffold professional, clean folder architectures on your secondary high-capacity drives.
+              Instantly scaffold professional, clean folder architectures on any mounted storage drive.
             </p>
           </div>
         </div>
@@ -191,7 +206,7 @@ export const BlueprintGenerator: React.FC = () => {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-gray-800">
           <div>
             <h3 className="text-base font-semibold text-white">Target Base Drive & Folder</h3>
-            <p className="text-xs text-gray-400">Choose which drive will host this structured hierarchy</p>
+            <p className="text-xs text-gray-400">Choose which mounted volume will host this structured hierarchy</p>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-xs text-gray-400">Target Drive:</span>
@@ -200,9 +215,14 @@ export const BlueprintGenerator: React.FC = () => {
               onChange={(e) => setBaseDrive(e.target.value)}
               className="bg-dark-900 border border-gray-700 text-white text-xs rounded-lg px-3 py-1.5 focus:outline-none focus:border-blue-500"
             >
-              <option value="D:\">D:\ (NVMe High-Speed SSD)</option>
-              <option value="E:\">E:\ (Large Volume Storage)</option>
-              <option value="C:\">C:\ (System Drive)</option>
+              {drives.map((d) => {
+                const mount = d.letter.endsWith('\\') ? d.letter : `${d.letter}\\`;
+                return (
+                  <option key={d.letter} value={mount}>
+                    {mount} ({d.label} — {formatBytes(d.free_bytes)} free)
+                  </option>
+                );
+              })}
             </select>
           </div>
         </div>

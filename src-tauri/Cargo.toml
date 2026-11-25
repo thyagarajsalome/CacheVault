@@ -1,12 +1,16 @@
 [package]
 name = "app"
-version = "0.1.0"
-description = "A Tauri App"
-authors = ["you"]
+version = "1.0.0"
+description = "CacheVault Pro - Windows Storage Suite"
+authors = ["Thyagaraja"]
 license = ""
 repository = ""
 edition = "2024"
 rust-version = "1.90"
+
+[[bin]]
+name = "CacheVault"
+path = "src/main.rs"
 
 [lib]
 name = "app_lib"

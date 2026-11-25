@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Navbar } from './components/Navbar';
+import { Navbar, NAV_GROUPS } from './components/Navbar';
 import { DriveOverview } from './components/DriveOverview';
 import { ClutterLiberator } from './components/ClutterLiberator';
 import { FolderJunctionMover } from './components/FolderJunctionMover';
@@ -34,56 +34,63 @@ export const App: React.FC = () => {
     fetchDrives();
   }, []);
 
+  const currentNavItem = NAV_GROUPS.flatMap((g) => g.items).find((i) => i.id === activeTab);
+
   return (
-    <div className="min-h-screen bg-[#0B0F19] text-gray-100 flex flex-col font-sans selection:bg-cyan-600 selection:text-white">
+    <div className="min-h-screen bg-[#0B0F19] text-gray-100 flex flex-col md:flex-row font-sans selection:bg-cyan-600 selection:text-white">
       <Navbar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         onRefresh={fetchDrives}
         isRefreshing={isRefreshing}
+        drives={drives}
       />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-7">
-        {activeTab === 'drives' && (
-          <DriveOverview
-            drives={drives}
-            isLoading={isRefreshing}
-            onOpenLiberator={() => setActiveTab('liberator')}
-            onOpenJunctions={() => setActiveTab('junctions')}
-          />
-        )}
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Clean Contextual Top Bar */}
+        <div className="hidden md:flex items-center justify-between px-8 h-14 border-b border-gray-800/70 bg-[#0B0F19]/90 backdrop-blur-sm sticky top-0 z-30">
+          <div className="flex items-center gap-2 text-xs text-gray-400">
+            <span>CacheVault Pro</span>
+            <span className="text-gray-600">/</span>
+            <span className="text-white font-semibold">{currentNavItem?.label || 'Workspace'}</span>
+          </div>
+          <button
+            onClick={() => setActiveTab('help')}
+            className="text-xs text-cyan-400 hover:text-cyan-300 font-medium transition-colors"
+          >
+            How to use this feature?
+          </button>
+        </div>
 
-        {activeTab === 'liberator' && <ClutterLiberator />}
+        <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-7">
+          {activeTab === 'drives' && (
+            <DriveOverview
+              drives={drives}
+              isLoading={isRefreshing}
+              onOpenLiberator={() => setActiveTab('liberator')}
+              onOpenJunctions={() => setActiveTab('junctions')}
+            />
+          )}
 
-        {activeTab === 'redirector' && <FolderRedirector />}
+          {activeTab === 'liberator' && <ClutterLiberator />}
 
-        {activeTab === 'junctions' && <FolderJunctionMover />}
+          {activeTab === 'redirector' && <FolderRedirector />}
 
-        {activeTab === 'blueprints' && <BlueprintGenerator />}
+          {activeTab === 'junctions' && <FolderJunctionMover />}
 
-        {activeTab === 'vacuum' && <DevVacuum />}
+          {activeTab === 'blueprints' && <BlueprintGenerator drives={drives} />}
 
-        {activeTab === 'giants' && <GiantFilesHunter />}
+          {activeTab === 'vacuum' && <DevVacuum drives={drives} />}
 
-        {activeTab === 'organizer' && <DownloadsSorter />}
+          {activeTab === 'giants' && <GiantFilesHunter drives={drives} />}
 
-        {activeTab === 'health' && <HealthWatchdog drives={drives} />}
+          {activeTab === 'organizer' && <DownloadsSorter />}
 
-        {activeTab === 'help' && <HelpGuide onNavigateTab={(tab) => setActiveTab(tab)} />}
-      </main>
+          {activeTab === 'health' && <HealthWatchdog drives={drives} />}
 
-      <footer className="border-t border-gray-800/80 py-3.5 text-center text-xs text-gray-500 bg-dark-900/60 backdrop-blur-sm flex items-center justify-center gap-4">
-        <span>
-          CacheVault Pro • Windows Storage Suite • Active Module:{' '}
-          <span className="text-cyan-400 font-semibold">{activeTab.toUpperCase()}</span>
-        </span>
-        <button
-          onClick={() => setActiveTab('help')}
-          className="text-cyan-400 hover:text-cyan-300 underline font-medium cursor-pointer"
-        >
-          Need Help? Open Guide
-        </button>
-      </footer>
+          {activeTab === 'help' && <HelpGuide onNavigateTab={(tab) => setActiveTab(tab)} />}
+        </main>
+      </div>
     </div>
   );
 };
